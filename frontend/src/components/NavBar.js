@@ -48,7 +48,7 @@ const NavBar = () => {
                   <i className="fas fa-home me-1"></i> Feed
                 </Nav.Link>
                 <Nav.Link as={Link} to="/profile">
-                  <i className="fas fa-user me-1"></i> Profile
+                  <i className="fas fa-user me-1"></i> Profille
                 </Nav.Link>
                 <Nav.Link as={Link} to="/progress">
                   <i className="fas fa-chart-line me-1"></i> Self Progress
