@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>API Test</title>
+  <script>
+    // Function to make a direct API call
+    async function testAPI() {
+      const resultDiv = document.getElementById('result');
+      
+      try {
+        // Test public endpoint
+        const response = await fetch('http://localhost:8080/api/test/status');
+        const data = await response.text();
+        resultDiv.innerHTML = `<p style="color: green">Success! Server response: ${data}</p>`;
+      } catch (error) {
+        resultDiv.innerHTML = `<p style="color: red">Error: ${error?.message || 'Unknown error occurred'}</p>`;
+      }
+    }
+
+    // Function to test auth endpoint
+    async function testAuth() {
+      const resultDiv = document.getElementById('auth-result');
+      
+      try {
+        // Test login endpoint
+        const response = await fetch('http://localhost:8080/api/auth/signin', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            username: 'testuser',
+            password: 'password'
+          })
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          resultDiv.innerHTML = `<p style="color: green">Success! Auth response: ${JSON.stringify(data)}</p>`;
+        } else {
+          const text = await response.text();
+          resultDiv.innerHTML = `<p style="color: orange">Server responded with status ${response.status}: ${text}</p>`;
+        }
+      } catch (error) {
+        resultDiv.innerHTML = `<p style="color: red">Error: ${error?.message || 'Unknown error occurred'}</p>`;
+      }
+    }
+  </script>
+</head>
+<body>
+  <h1>API Test Page</h1>
+  
+  <button onclick="testAPI()">Test Public API</button>
+  <div id="result">Results will appear here...</div>
+  
+  <hr>
+  
+  <button onclick="testAuth()">Test Auth API</button>
+  <div id="auth-result">Auth results will appear here...</div>
+</body>
+</html> 
