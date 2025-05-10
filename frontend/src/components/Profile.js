@@ -154,7 +154,7 @@ const Profile = () => {
                         <div className="stat-label">Workouts</div>
                       </div>
                       <div className="stat-card">
-                        <div className="stat-value">3</div>
+                        <div className="stat-value">7</div>
                         <div className="stat-label">Month Streak</div>
                       </div>
                       <div className="stat-card">
