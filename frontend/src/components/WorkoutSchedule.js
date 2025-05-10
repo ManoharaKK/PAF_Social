@@ -445,7 +445,7 @@ const WorkoutSchedule = () => {
         <Modal.Body className="workout-modal-body">
           <Form onSubmit={handleSubmit}>
             <Form.Group className="mb-4">
-              <Form.Label>Workout Titlee</Form.Label>
+              <Form.Label>Workout Titleee</Form.Label>
               <Form.Control
                 type="text"
                 name="title"
