@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Image</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background-color: #f0f2f5;
+        }
+        .image-container {
+            max-width: 100%;
+            background-color: white;
+            padding: 10px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin: 20px 0;
+        }
+        img {
+            max-width: 100%;
+            max-height: 70vh;
+            display: block;
+        }
+        .controls {
+            margin-top: 20px;
+            display: flex;
+            gap: 10px;
+        }
+        button {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            background-color: #1877f2;
+            color: white;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #166fe5;
+        }
+        input {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            width: 100%;
+            max-width: 400px;
+        }
+        .error {
+            color: #e41e3f;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>Image Viewer</h1>
+    
+    <div class="controls">
+        <input type="text" id="imageUrl" placeholder="Enter image URL or filename">
+        <button onclick="loadImage()">Load Image</button>
+    </div>
+    
+    <div id="error" class="error"></div>
+    
+    <div class="image-container">
+        <img id="imageDisplay" src="/image-not-found.svg" alt="Image will be displayed here">
+    </div>
+    
+    <div class="controls">
+        <button onclick="window.history.back()">Back to Wall</button>
+        <button onclick="downloadImage()">Download Image</button>
+    </div>
+    
+    <script>
+        // Get URL parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const imageParam = urlParams.get('image');
+        
+        // Function to load image from URL or filename
+        function loadImage(url) {
+            const errorEl = document.getElementById('error');
+            errorEl.textContent = '';
+            
+            // Get the URL from parameter or input field
+            const imageUrl = url || document.getElementById('imageUrl').value || imageParam;
+            
+            if (!imageUrl) {
+                errorEl.textContent = 'Please enter an image URL or filename';
+                return;
+            }
+            
+            const imgElement = document.getElementById('imageDisplay');
+            
+            // Process URL
+            let finalUrl = imageUrl;
+            
+            // If it's just a filename, assume it's from the backend
+            if (!imageUrl.startsWith('http') && !imageUrl.startsWith('/')) {
+                finalUrl = `http://localhost:8080/api/files/images/${imageUrl}`;
+            }
+            // If it's a relative URL starting with /api
+            else if (imageUrl.startsWith('/api')) {
+                finalUrl = `http://localhost:8080${imageUrl}`;
+            }
+            
+            // Load image with fetch + blob to bypass CORS issues
+            fetch(finalUrl, {
+                method: 'GET',
+                mode: 'cors',
+                credentials: 'omit'
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`Failed to load image: ${response.status} ${response.statusText}`);
+                }
+                return response.blob();
+            })
+            .then(blob => {
+                const objectUrl = URL.createObjectURL(blob);
+                imgElement.src = objectUrl;
+                
+                // Update the input field
+                document.getElementById('imageUrl').value = finalUrl;
+                
+                // Update page title
+                document.title = `Viewing: ${imageUrl.split('/').pop()}`;
+            })
+            .catch(error => {
+                errorEl.textContent = error.message;
+                imgElement.src = '/image-not-found.svg';
+            });
+        }
+        
+        // Function to download the current image
+        function downloadImage() {
+            const imgElement = document.getElementById('imageDisplay');
+            
+            // Check if image is loaded
+            if (imgElement.src.includes('image-not-found.svg')) {
+                document.getElementById('error').textContent = 'No image loaded to download';
+                return;
+            }
+            
+            // Create a temporary link to download the image
+            const link = document.createElement('a');
+            link.href = imgElement.src;
+            link.download = imageParam ? imageParam.split('/').pop() : 'downloaded-image.jpg';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+        
+        // Load image from URL parameter when page loads
+        if (imageParam) {
+            loadImage(imageParam);
+        }
+    </script>
+</body>
+</html> 
