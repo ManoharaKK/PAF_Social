@@ -45,7 +45,7 @@ const NavBar = () => {
             {currentUser && (
               <>
                 <Nav.Link as={Link} to="/wall">
-                  <i className="fas fa-home me-1"></i> Feed
+                  <i className="fas fa-home me-1"></i> Feede
                 </Nav.Link>
                 <Nav.Link as={Link} to="/profile">
                   <i className="fas fa-user me-1"></i> Profille
